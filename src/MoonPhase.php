@@ -260,7 +260,7 @@ final class MoonPhase
 
 	private function fixAngle(float $a): float
 	{
-		return ($a - 360 * floor($a / 360));
+		return $a - 360 * floor($a / 360);
 	}
 
 
