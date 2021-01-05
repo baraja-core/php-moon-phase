@@ -1,7 +1,7 @@
 {
-	"name": "janbarasek/php-moon-phase",
+	"name": "baraja-core/php-moon-phase",
 	"description": "A PHP class for calculating the phase of the Moon.",
-	"homepage": "http://www.github.com/janbarasek/php-moon-phase",
+	"homepage": "https://github.com/baraja-core/php-moon-phase",
 	"keywords": [
 		"php",
 		"moon",
@@ -29,7 +29,7 @@
 	},
 	"autoload": {
 		"psr-0": {
-			"Solaris": ""
+			"src": ""
 		}
 	}
 }

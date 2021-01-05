@@ -1,67 +1,33 @@
 <?php
-/**
- * Moon phase calculation class
- * Adapted for PHP from Moontool for Windows (http://www.fourmilab.ch/moontoolw/)
- * by Samir Shah (http://rayofsolaris.net)
- * License: MIT
- *
- * Refactor by Jan Barasek <jan@barasek.com> http://baraja.cz
- */
 
-namespace Solaris;
+declare(strict_types=1);
 
-class MoonPhase
+namespace Baraja;
+
+
+final class MoonPhase
 {
+	private ?int $timestamp;
 
-	/**
-	 * @var int|null
-	 */
-	private $timestamp;
+	private float $phase;
 
-	/**
-	 * @var float
-	 */
-	private $phase;
+	private float $illum;
 
-	/**
-	 * @var float
-	 */
-	private $illum;
+	private float $age;
 
-	/**
-	 * @var float
-	 */
-	private $age;
+	private float $distance;
 
-	/**
-	 * @var float
-	 */
-	private $distance;
+	private float $angularDiameter;
 
-	/**
-	 * @var float
-	 */
-	private $angularDiameter;
+	private float $sunDistance;
 
-	/**
-	 * @var float
-	 */
-	private $sunDistance;
+	private float $sunAngularDiameter;
 
-	/**
-	 * @var float
-	 */
-	private $sunAngularDiameter;
+	private float $synMonth;
 
-	/**
-	 * @var float
-	 */
-	private $synMonth;
+	/** @var float[] */
+	private array $quarters = [];
 
-	/**
-	 * @var float[]
-	 */
-	private $quarters = [];
 
 	/**
 	 * @param \DateTime|int|string|null $date
@@ -73,7 +39,7 @@ class MoonPhase
 		} elseif ($date instanceof \DateTime) {
 			$time = $date->getTimestamp();
 		} else {
-			$time = is_numeric($date) ? $date : @strtotime($date);
+			$time = (int) (is_numeric($date) ? $date : @strtotime($date));
 		}
 
 		$epoch = 2444238.5;           // Astronomical constant: 1980 January 0.0
@@ -143,6 +109,7 @@ class MoonPhase
 		$this->sunAngularDiameter = (float) $sunAngular;                    // Sun's angular diameter (degrees)
 	}
 
+
 	/**
 	 * @return float (0 - 1)
 	 */
@@ -151,15 +118,15 @@ class MoonPhase
 		return $this->phase;
 	}
 
+
 	/**
 	 * KEPLER: Solve the equation of Kepler.
-	 *
-	 * @return float
 	 */
 	public function illumination(): float
 	{
 		return $this->illum;
 	}
+
 
 	/**
 	 * Calculates  time  of  the mean new Moon for a given
@@ -169,125 +136,101 @@ class MoonPhase
 	 *    K = (year - 1900) * 12.3685
 	 *
 	 * where year is expressed as a year and fractional year.
-	 *
-	 * @return float
 	 */
 	public function getAge(): float
 	{
 		return $this->age;
 	}
 
+
 	/**
 	 * Given a K value used to determine the mean phase of
 	 * the new moon, and a phase selector
 	 * (0.0, 0.25, 0.5, 0.75), obtain the true, corrected phase time.
-	 *
-	 * @return float
 	 */
 	public function getDistance(): float
 	{
 		return $this->distance;
 	}
 
+
 	/**
 	 * Find time of phases of the moon which surround the current date.
 	 * Five phases are found, starting and ending with the new moons which bound the  current lunation.
-	 *
-	 * @return float
 	 */
 	public function getDiameter(): float
 	{
 		return $this->angularDiameter;
 	}
 
+
 	/**
 	 * Distance to Sun (kilometres)
-	 *
-	 * @return float
 	 */
 	public function getSunDistance(): float
 	{
 		return $this->sunDistance;
 	}
 
+
 	/**
 	 * Sun's angular diameter (degrees)
-	 *
-	 * @return float
 	 */
 	public function getSunDiameter(): float
 	{
 		return $this->sunAngularDiameter;
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getNewMoon(): ?float
 	{
 		return $this->getPhase(0);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getFirstQuarter(): ?float
 	{
 		return $this->getPhase(1);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getFullMoon(): ?float
 	{
 		return $this->getPhase(2);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getLastQuarter(): ?float
 	{
 		return $this->getPhase(3);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getNextNewMoon(): ?float
 	{
 		return $this->getPhase(4);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getNextFirstQuarter(): ?float
 	{
 		return $this->getPhase(5);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getNextFullMoon(): ?float
 	{
 		return $this->getPhase(6);
 	}
 
-	/**
-	 * @return float|null
-	 */
+
 	public function getNextLastQuarter(): ?float
 	{
 		return $this->getPhase(7);
 	}
 
-	/**
-	 * @return string
-	 */
-	public function phaseName(): string
+
+	public function phaseName(): ?string
 	{
 		$names = [
 			'New Moon',
@@ -301,13 +244,10 @@ class MoonPhase
 			'New Moon',
 		];
 
-		return $names[(int) floor(($this->phase + 0.0625) * 8)];
+		return $names[(int) floor(($this->phase + 0.0625) * 8)] ?? null;
 	}
 
-	/**
-	 * @param int $n
-	 * @return float|null
-	 */
+
 	public function getPhase(int $n): ?float
 	{
 		if ($this->quarters === []) {
@@ -317,25 +257,16 @@ class MoonPhase
 		return $this->quarters[$n] ?? null;
 	}
 
-	/**
-	 * @param float $a
-	 * @return float
-	 */
+
 	private function fixAngle(float $a): float
 	{
 		return ($a - 360 * floor($a / 360));
 	}
 
-	/**
-	 * @param float $m
-	 * @param float $ecc
-	 * @param float $epsilon
-	 * @return float
-	 */
+
 	private function kepler(float $m, float $ecc, float $epsilon = 1e-6): float
 	{
 		$e = $m = deg2rad($m);
-
 		do {
 			$delta = $e - $ecc * sin($e) - $m;
 			$e -= $delta / (1 - $ecc * cos($e));
@@ -344,30 +275,20 @@ class MoonPhase
 		return $e;
 	}
 
-	/**
-	 * @param int $date
-	 * @param float $k
-	 * @return float
-	 */
+
 	private function meanPhase(int $date, float $k): float
 	{
 		$timeInJulian = ($date - 2415020.0) / 36525;
 		$t2 = $timeInJulian * $timeInJulian;
 		$t3 = $t2 * $timeInJulian;
 
-		$nt1 = 2415020.75933 + $this->synMonth * $k
+		return 2415020.75933 + $this->synMonth * $k
 			+ 0.0001178 * $t2
 			- 0.000000155 * $t3
 			+ 0.00033 * sin(deg2rad(166.56 + 132.87 * $timeInJulian - 0.009173 * $t2));
-
-		return $nt1;
 	}
 
-	/**
-	 * @param float $k
-	 * @param float $phase
-	 * @return float|null
-	 */
+
 	private function truePhase(float $k, float $phase): ?float
 	{
 		$apcor = false;
@@ -401,7 +322,7 @@ class MoonPhase
 				+ 0.0010 * sin(deg2rad(2 * $f - $mPrime))
 				+ 0.0005 * sin(deg2rad($m + 2 * $mPrime));
 			$apcor = true;
-		} else if (abs($phase - 0.25) < 0.01 || abs($phase - 0.75) < 0.01) {
+		} elseif (abs($phase - 0.25) < 0.01 || abs($phase - 0.75) < 0.01) {
 			$pt += (0.1721 - 0.0004 * $t) * sin(deg2rad($m))
 				+ 0.0021 * sin(deg2rad(2 * $m))
 				- 0.6280 * sin(deg2rad($mPrime))
@@ -430,22 +351,23 @@ class MoonPhase
 		return $apcor === true ? $pt : null;
 	}
 
+
 	private function phaseHunt(): void
 	{
 		$date = $this->utcToJulian($this->timestamp);
-		$_date = $date - 45;
+		$dateHelper = $date - 45;
 		$ats = $this->timestamp - 86400 * 45;
 		$yy = (int) gmdate('Y', $ats);
 		$mm = (int) gmdate('n', $ats);
 
 		$k1 = floor(($yy + (($mm - 1) * (1 / 12)) - 1900) * 12.3685);
 		$k2 = 0;
-		$_date = $nt1 = $this->meanPhase($_date, $k1);
+		$dateHelper = $nt1 = $this->meanPhase($dateHelper, $k1);
 
 		while (true) {
-			$_date += $this->synMonth;
+			$dateHelper += $this->synMonth;
 			$k2 = $k1 + 1;
-			$nt2 = $this->meanPhase($_date, $k2);
+			$nt2 = $this->meanPhase((int) $dateHelper, $k2);
 
 			// if nt2 is close to $date, then mean phase isn't good enough, we have to be more accurate
 			if (abs($nt2 - $date) < 0.75) {
@@ -476,13 +398,9 @@ class MoonPhase
 		}
 	}
 
-	/**
-	 * @param int $timestamp
-	 * @return float
-	 */
+
 	private function utcToJulian(int $timestamp): float
 	{
 		return $timestamp / 86400 + 2440587.5;
 	}
-
 }
