@@ -7,7 +7,7 @@ namespace Baraja;
 
 final class MoonPhase
 {
-	private ?int $timestamp;
+	private int $timestamp;
 
 	private float $phase;
 
@@ -42,6 +42,7 @@ final class MoonPhase
 			$time = (int) (is_numeric($date) ? $date : @strtotime($date));
 		}
 
+		$this->timestamp = $time;
 		$epoch = 2444238.5;           // Astronomical constant: 1980 January 0.0
 
 		// ---- Constants defining the Sun's apparent orbit  */
@@ -59,7 +60,6 @@ final class MoonPhase
 		$msmax = 384401;              // Semi-major axis of Moon's orbit in km
 		$synmonth = 29.53058868;      // Synodic month (new Moon to new Moon)
 		$this->synMonth = $synmonth;
-		$this->timestamp = $time;
 
 		// date is coming in as a UNIX timstamp, so convert it to Julian
 		$time = ($time / 86400) + 2440587.5;
@@ -362,7 +362,7 @@ final class MoonPhase
 
 		$k1 = floor(($yy + (($mm - 1) * (1 / 12)) - 1900) * 12.3685);
 		$k2 = 0;
-		$dateHelper = $nt1 = $this->meanPhase($dateHelper, $k1);
+		$dateHelper = $nt1 = $this->meanPhase((int) $dateHelper, $k1);
 
 		while (true) {
 			$dateHelper += $this->synMonth;
